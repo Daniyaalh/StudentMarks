@@ -37,7 +37,7 @@ class App(QWidget):
         self.message.move(170, 35)
         
         self.passwordbox = QLineEdit(self)
-        self.passwordbox.hasSelectedText
+        #self.passwordbox.hasSelectedText
         self.passwordbox.setStyleSheet("QLineEdit {font: 18;}")
         self.passwordbox.move(125,100)
         self.passwordbox.setEchoMode(QLineEdit.Password)
@@ -53,7 +53,7 @@ class App(QWidget):
 
         self.show()
 
-    @pyqtSlot()
+    #@pyqtSlot()
     def on_click(self):
         print(type(self.passwordbox.text))
         if (self.passwordbox.text == "3331"):
