@@ -51,57 +51,203 @@ def view_all_summary(screen):
     screen.view_all_summary.setLayout(layout)
     #screen.show()
 
+def view_course_marks(screen):
+    layout = QVBoxLayout()
+    
+    table = QTableWidget()
+
+    table.setRowCount(5)
+    table.setColumnCount(3)
+
+    table.setItem(0,0, QTableWidgetItem("Assignment Name"))
+    table.setItem(0,1, QTableWidgetItem("Mark (%)"))
+    table.setItem(0,2, QTableWidgetItem("Worth (%)"))
+
+    table.verticalHeader().setVisible(False)
+    table.horizontalHeader().setVisible(False)
+    
+    table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    
+    course_name = QComboBox(screen.view_course_marks)
+    course_name.addItem("CSC263")
+    course_name.addItem("CSC343")
+    course_name.setStyleSheet("QComboBox {font: 18;}")
+    
+    topword = QLabel("View Marks for a Course", screen.view_course_marks)
+    topword.setStyleSheet("QLabel {font: 12pt bold;}")
+
+    backButton = QPushButton("Back", screen.view_course_marks)
+    backButton.setStyleSheet("QLineEdit {font: 8pt;}")
+    backButton.clicked.connect(screen.back_click)
+
+
+    layout.addWidget(topword)
+    layout.addWidget(course_name)
+    layout.addWidget(table)
+    layout.addWidget(backButton)
+
+    screen.view_course_marks.setLayout(layout)
+
+    
+
+    
 def addMarkGUI(screen):
-    #screen.QLabel
+    layout = QFormLayout()
+   
+    topword = QLabel("Enter a Mark", screen.enter_marks)
+    topword.setStyleSheet("QLabel {font: 12pt bold;}")
 
-    screen.course = QLineEdit(screen)
-    screen.course.setStyleSheet("QLineEdit {font: 18;}")
-# move it to right place
+    course_name = QComboBox(screen.enter_marks)
+    course_name.addItem("CSC263")
+    course_name.addItem("CSC343")
+    course_name.setStyleSheet("QComboBox {font: 18;}")
 
-    screen.assignment_name = QLineEdit(screen)
-    screen.assignment_name.setStyleSheet("QLineEdit {font: 12;}")
-    screen.assignment_name.move(200, 100) #y axis the same
-    screen.assignment_name.show()
-
-    screen.styleChoice = QLabel("Windows Vista", screen)
-    screen.styleChoice.move(50, 150)
-
+    #drop down
+    assign_name = QLineEdit(screen.enter_marks)
+    assign_name.setStyleSheet("QLineEdit {font: 12pt bold;}")
     
-    screen.select_course = QComboBox(screen)
-    screen.select_course.addItem("CSC263")
-    screen.select_course.addItem("MAT223")
-    screen.select_course.move(500, 500)
-
-    screen.select_course.show()
-    #screen.select_course.activated[str].connect(screen.styleChoice)
-
+    num = QLineEdit(screen.enter_marks)
+    num.setStyleSheet("QLineEdit {font: 12pt bold;}")
     
-    screen.mark = QLineEdit(screen)
-    screen.mark.setStyleSheet("QLineEdit {font: 12;}")
-    screen.mark.move(150, 100)
-    screen.mark.show()
+    denom= QLineEdit(screen.enter_marks)
+    denom.setStyleSheet("QLineEdit {font: 12pt bold;}")
+    
+    worth = QLineEdit(screen.enter_marks)
+    worth.setStyleSheet("QLineEdit {font: 12pt bold;}")
 
-    screen.outof = QLineEdit(screen)
-    screen.outof.setStyleSheet("QLineEdit {font: 12;}")
-    screen.outof.move(150, 150)
-    screen.outof.show()
+    submitButton = QPushButton("Enter", screen.enter_marks)
+    submitButton.setStyleSheet("QPushButton {font: 12pt bold;}")
 
-    screen.worth = QLineEdit(screen)
-    screen.worth.setStyleSheet("QLineEdit {font: 12;} ")
-    screen.worth.move(150, 200)
-    screen.worth.show()
+    backButton = QPushButton("Back", screen.enter_marks)
+    backButton.setStyleSheet("QLineEdit {font: 8pt;}")
+    backButton.clicked.connect(screen.back_click)
 
+    layout.addWidget(topword)
+    layout.addWidget(course_name)
+    layout.addRow("Course Code", course_name)
+    layout.addRow("Assignment Name:", assign_name)
+    layout.addRow("What you got:", num)
+    layout.addRow("What it was out of:", denom)
+    layout.addRow("How much it was worth:", worth)
+    layout.addWidget(submitButton)
+    layout.addWidget(backButton)
+#After entered, clear textboxes
+    #screen.enter_marks.move(40, 70)
+    screen.enter_marks.setLayout(layout)
+    
+def edit_marks(screen):
+    layout = QFormLayout()
+    topword = QLabel("Edit Marks", screen.edit_marks)
+    topword.setStyleSheet("QLabel {font: 12pt bold;}")
+
+    course_name = QComboBox(screen.edit_marks)
+    course_name.addItem("CSC263")
+    course_name.addItem("CSC343")
+    course_name.setStyleSheet("QComboBox {font: 18;}")
+
+    assign_name = QComboBox(screen.edit_marks)
+    assign_name.addItem("A1")
+    assign_name.addItem("A2")
+
+    num = QLineEdit(screen.enter_marks)
+    num.setStyleSheet("QLineEdit {font: 12pt bold;}")
+    
+    denom= QLineEdit(screen.enter_marks)
+    denom.setStyleSheet("QLineEdit {font: 12pt bold;}")
+    
+    worth = QLineEdit(screen.enter_marks)
+    worth.setStyleSheet("QLineEdit {font: 12pt bold;}")
+
+    submitButton = QPushButton("Enter", screen.enter_marks)
+    submitButton.setStyleSheet("QPushButton {font: 12pt bold;}")
+
+    backButton = QPushButton("Back", screen.enter_marks)
+    backButton.setStyleSheet("QLineEdit {font: 8pt;}")
+    backButton.clicked.connect(screen.back_click)
+
+    layout.addWidget(topword)
+    layout.addRow("Course Code", course_name)
+    layout.addRow("Assignment Name", assign_name)
+    layout.addRow("Revised what you got", num)
+    layout.addRow("Revised what it was out of", denom)
+    layout.addRow("Revised worth", worth)
+    layout.addWidget(submitButton)
+    layout.addWidget(backButton)
+
+    layout.setSpacing(20)
+
+    screen.edit_marks.move(40, 70)
+    screen.edit_marks.setLayout(layout)
+    
 def hideEnter(screen):
     screen.passwordbox.deleteLater()
     screen.button.deleteLater()
     screen.message.deleteLater()
     screen.error.deleteLater()   
 
-def makeMain(window): #enter marks, edit marks
+def add_course(screen):
+    layout = QVBoxLayout()
+
+    top = QLabel("Add a Course", screen.add_course)
+    top.setStyleSheet("QLabel {font: 12pt; }")
+
+    name_label = QLabel("Course Code", screen.add_course)
+    name_label.setStyleSheet("QLabel {font: 12pt; }")
+
+    course_name = QLineEdit(screen.add_course)
+    course_name.setStyleSheet("QLineEdit {font: 12pt bold;}")
+
+    submitButton = QPushButton("Add", screen.add_course)
+    submitButton.setStyleSheet("QPushButton {font: 18pt bold;}")
+
+    backButton = QPushButton("Back", screen.add_course)
+    backButton.setStyleSheet("QLineEdit {font: 8pt;}")
+    backButton.clicked.connect(screen.back_click)
+
+    layout.addWidget(top)
+    layout.addWidget(name_label)
+    layout.addWidget(course_name)
+    layout.addWidget(submitButton)
+    layout.addWidget(backButton)
+    layout.setAlignment(Qt.AlignTop)
+
+    layout.setSpacing(20)
+    screen.add_course.setLayout(layout)
+
+def delete_course(screen):
+    layout = QVBoxLayout()
+
+    top = QLabel("Delete a Course", screen.delete_course)
+    top.setStyleSheet("QLabel {font: 12pt; }")
+
+    name_label = QLabel("Course Code", screen.delete_course)
+    name_label.setStyleSheet("QLabel {font: 12pt; }")
+
+    course_name = QComboBox(screen.delete_course)
+    course_name.setStyleSheet("QComboBox {font: 12pt bold;}")
+
+    submitButton = QPushButton("Delete", screen.delete_course)
+    submitButton.setStyleSheet("QPushButton {font: 18pt bold;}")
+
+    backButton = QPushButton("Back", screen.delete_course)
+    backButton.setStyleSheet("QPushButton {font: 8pt;}")
+    backButton.clicked.connect(screen.back_click)
+
+    layout.addWidget(top)
+    layout.addWidget(name_label)
+    layout.addWidget(course_name)
+    layout.addWidget(submitButton)
+    layout.addWidget(backButton)
+
+    layout.setAlignment(Qt.AlignTop)
+    layout.setSpacing(20)
+    screen.delete_course.setLayout(layout)
+
+    
+def makeMain(window):
     label = QLabel("Main Menu", window)
     label.setStyleSheet("QLabel {font: 12pt; }")
     
-   # window = QWidget(screen)
     layout = QVBoxLayout()
     
     viewButton = QPushButton("View Summary of all Marks", window.main_menu)
@@ -110,23 +256,23 @@ def makeMain(window): #enter marks, edit marks
 
     course_marks = QPushButton("View Marks for a Course", window.main_menu)
     course_marks.setStyleSheet("QPushButton {font: 12pt bold;}")
-    #course_marks.clicked.connect(screen.view_click)
+    course_marks.clicked.connect(window.view_course_click)
  
     enterMarkButton = QPushButton("Enter a Mark", window.main_menu)
     enterMarkButton.setStyleSheet("QPushButton {font: 12pt bold;}")
-    #enterMarkButton.clicked.connect(screen.enter_click)
+    enterMarkButton.clicked.connect(window.enter_marks_click)
 
     editMarkButton = QPushButton("Edit Course Mark", window.main_menu)
     editMarkButton.setStyleSheet("QPushButton {font: 12pt bold;}")
-    #editMarkButton.clicked.connect(screen.edit_click)
+    editMarkButton.clicked.connect(window.edit_click)
 
     addCourseButton = QPushButton("Add a Course", window.main_menu)
     addCourseButton.setStyleSheet("QPushButton {font: 12pt bold;}")
-    # connect
+    addCourseButton.clicked.connect(window.add_course_click)
 
     deleteCourseButton = QPushButton("Delete a Course", window.main_menu)
     deleteCourseButton.setStyleSheet("QPushButton {font: 12pt bold;}")
-    #connect
+    deleteCourseButton.clicked.connect(window.delete_course_click)
 
     layout.addWidget(label)
     layout.addWidget(viewButton)
@@ -138,13 +284,10 @@ def makeMain(window): #enter marks, edit marks
     layout.addWidget(deleteCourseButton)
 
     layout.setSpacing(30)
-    #window.move(90, 50)
-    window.main_menu.setLayout(layout)
-    print("8")    
+    #window.main_menu.move(90, 50)
+    window.main_menu.setLayout(layout)   
     #window.show()
-    print("ki")
     #screen.stack.setCurrentIndex(0)
-    print("ji")
 
 """
 def hideMainButton(screen):
@@ -156,7 +299,8 @@ def hideMainButton(screen):
 class App(QWidget):
 
     def __init__(self):
-        if not os.path.isdir((os.getcwd() + "\marks.txt")):
+        self.first_time = False
+        if not os.path.isfile((os.getcwd() + "\marks.txt")):
             file = open("marks.txt", "w")
             file.close()
             self.first_time = True
@@ -227,21 +371,28 @@ class App(QWidget):
 
         self.main_menu = QWidget()
         self.view_all_summary = QWidget()
+        self.view_course_marks = QWidget()
         self.enter_marks = QWidget()
         self.edit_marks = QWidget()
         self.add_course = QWidget()
-        self.delete_marks = QWidget()
+        self.delete_course = QWidget()
 
         makeMain(self)
         view_all_summary(self)
+        view_course_marks(self)
+        addMarkGUI(self)
+        edit_marks(self)
+        add_course(self)
+        delete_course(self)
         
         
         self.stack.addWidget(self.main_menu)
         self.stack.addWidget(self.view_all_summary)
+        self.stack.addWidget(self.view_course_marks)
         self.stack.addWidget(self.enter_marks)
         self.stack.addWidget(self.edit_marks)
         self.stack.addWidget(self.add_course)
-        self.stack.addWidget(self.delete_marks)
+        self.stack.addWidget(self.delete_course)
 
         
         self.show()
@@ -252,7 +403,7 @@ class App(QWidget):
             self.actionExit.setEnabled(False)
             hideEnter(self)
             self.stack.setCurrentWidget(self.main_menu)
-            #Make a QWidget for each button section and do the same thing as above
+            
         else:        
             self.error.show()
             self.passwordbox.setText("")
@@ -262,22 +413,20 @@ class App(QWidget):
     def view_all_click(self):
         self.stack.setCurrentIndex(1)
 
-    def view_course(self):
-        self.stack.setCurrentIndex(2)
+    def view_course_click(self):
+        self.stack.setCurrentWidget(self.view_course_marks)
 
     def enter_marks_click(self):
-
-        addMarkGUI(self)
-        self.stack.setCurrentIndex(3)
+        self.stack.setCurrentWidget(self.enter_marks)
         
     def edit_click(self):
-        self.stack.setCurrentIndex(4)
+        self.stack.setCurrentWidget(self.edit_marks)
         
     def add_course_click(self):
-        self.stack.setCurrentIndex(5)
+        self.stack.setCurrentWidget(self.add_course)
 
     def delete_course_click(self):
-        self.stack.setCurrentIndex(6)
+        self.stack.setCurrentWidget(self.delete_course)
        
     def back_click(self):
         self.stack.setCurrentIndex(0)
