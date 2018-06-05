@@ -3,13 +3,15 @@ import sys, os
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, \
 QLineEdit, QLabel, QAction, QComboBox, QVBoxLayout, QSpacerItem, \
 QStackedWidget, QFormLayout, QTableWidget, QTableWidgetItem
-#from PyQt5.QtGui import QIcon
 from PyQt5.QtGui import *
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtCore import Qt
 
 def view_all_summary(screen):
 
+    title = QLabel("Summary", screen.view_all_summary)
+    title.setStyleSheet("QLabel {font: 12pt bold;}")
+    
     font = QFont()
     font.setPointSize(12)
     font.setBold(True)
@@ -20,9 +22,18 @@ def view_all_summary(screen):
     table.verticalHeader().setVisible(False)
     table.horizontalHeader().setVisible(False)
 
-    table.setItem(0,0, QTableWidgetItem("Course Code"))
-    table.setItem(0,1, QTableWidgetItem("Mark (%)"))
-    table.setItem(0,2, QTableWidgetItem("% Completed").setFont(font))
+    course_code = QTableWidgetItem("Course Code")
+    course_code.setBackground(QColor(255,128,128))
+
+    mark = QTableWidgetItem("Mark (%)")
+    mark.setBackground(QColor(255,128,128))
+
+    completed = QTableWidgetItem("% Completed")
+    completed.setBackground(QColor(255,128,128))
+
+    table.setItem(0,0, course_code)
+    table.setItem(0,1, mark)
+    table.setItem(0,2, completed)
     table.setRowHeight(0, 50)
     table.setMinimumWidth(450)
     table.setMinimumHeight(400) #Will need to set max height as well
@@ -37,6 +48,10 @@ def view_all_summary(screen):
     
     table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
     table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+    layout.addWidget(title)
+    layout.setAlignment(title, Qt.AlignCenter)
+    
     layout.addWidget(table)
     layout.addWidget(button)
     
@@ -59,9 +74,18 @@ def view_course_marks(screen):
     table.setRowCount(5)
     table.setColumnCount(3)
 
-    table.setItem(0,0, QTableWidgetItem("Assignment Name"))
-    table.setItem(0,1, QTableWidgetItem("Mark (%)"))
-    table.setItem(0,2, QTableWidgetItem("Worth (%)"))
+    course_code = QTableWidgetItem("Assignment Name")
+    course_code.setBackground(QColor(255,128,128))
+
+    mark = QTableWidgetItem("Mark (%)")
+    mark.setBackground(QColor(255,128,128))
+
+    completed = QTableWidgetItem("Worth (%)")
+    completed.setBackground(QColor(255,128,128))
+    
+    table.setItem(0,0, course_code)
+    table.setItem(0,1, mark)
+    table.setItem(0,2, completed)
 
     table.verticalHeader().setVisible(False)
     table.horizontalHeader().setVisible(False)
@@ -88,9 +112,6 @@ def view_course_marks(screen):
 
     screen.view_course_marks.setLayout(layout)
 
-    
-
-    
 def addMarkGUI(screen):
     layout = QFormLayout()
    
@@ -100,9 +121,8 @@ def addMarkGUI(screen):
     course_name = QComboBox(screen.enter_marks)
     course_name.addItem("CSC263")
     course_name.addItem("CSC343")
-    course_name.setStyleSheet("QComboBox {font: 18;}")
+    course_name.setStyleSheet("QComboBox {font: 12pt;}")
 
-    #drop down
     assign_name = QLineEdit(screen.enter_marks)
     assign_name.setStyleSheet("QLineEdit {font: 12pt bold;}")
     
@@ -124,7 +144,7 @@ def addMarkGUI(screen):
 
     layout.addWidget(topword)
     layout.addWidget(course_name)
-    layout.addRow("Course Code", course_name)
+    layout.addRow("Course Code:", course_name)
     layout.addRow("Assignment Name:", assign_name)
     layout.addRow("What you got:", num)
     layout.addRow("What it was out of:", denom)
@@ -132,7 +152,6 @@ def addMarkGUI(screen):
     layout.addWidget(submitButton)
     layout.addWidget(backButton)
 #After entered, clear textboxes
-    #screen.enter_marks.move(40, 70)
     screen.enter_marks.setLayout(layout)
     
 def edit_marks(screen):
@@ -143,9 +162,10 @@ def edit_marks(screen):
     course_name = QComboBox(screen.edit_marks)
     course_name.addItem("CSC263")
     course_name.addItem("CSC343")
-    course_name.setStyleSheet("QComboBox {font: 18;}")
+    course_name.setStyleSheet("QComboBox {font: 12pt;}")
 
     assign_name = QComboBox(screen.edit_marks)
+    assign_name.setStyleSheet("QComboBox {font: 12pt;}")
     assign_name.addItem("A1")
     assign_name.addItem("A2")
 
@@ -180,6 +200,7 @@ def edit_marks(screen):
     screen.edit_marks.setLayout(layout)
     
 def hideEnter(screen):
+    screen.logo.deleteLater()
     screen.passwordbox.deleteLater()
     screen.button.deleteLater()
     screen.message.deleteLater()
@@ -205,6 +226,7 @@ def add_course(screen):
     backButton.clicked.connect(screen.back_click)
 
     layout.addWidget(top)
+    layout.setAlignment(top, Qt.AlignCenter)
     layout.addWidget(name_label)
     layout.addWidget(course_name)
     layout.addWidget(submitButton)
@@ -234,6 +256,7 @@ def delete_course(screen):
     backButton.clicked.connect(screen.back_click)
 
     layout.addWidget(top)
+    layout.setAlignment(top, Qt.AlignCenter)
     layout.addWidget(name_label)
     layout.addWidget(course_name)
     layout.addWidget(submitButton)
@@ -276,7 +299,6 @@ def makeMain(window):
 
     layout.addWidget(label)
     layout.addWidget(viewButton)
-    #layout.addSpacerItem(space) http://www.qtcentre.org/threads/27968-QSpacerItem-constructor-arguments
     layout.addWidget(course_marks)
     layout.addWidget(enterMarkButton)
     layout.addWidget(editMarkButton)
@@ -284,10 +306,7 @@ def makeMain(window):
     layout.addWidget(deleteCourseButton)
 
     layout.setSpacing(30)
-    #window.main_menu.move(90, 50)
     window.main_menu.setLayout(layout)   
-    #window.show()
-    #screen.stack.setCurrentIndex(0)
 
 """
 def hideMainButton(screen):
@@ -329,44 +348,46 @@ class App(QWidget):
         self.setPalette(p)
 
         vbox = QVBoxLayout(self)
+
+        self.logo = QLabel("Marks Keeper", self)
+        self.logo.setStyleSheet("QLabel {font: 18pt;}")
         
         self.passwordmsg = "Enter password" if not self.first_time else "Enter a Password"
         self.message = QLabel(self.passwordmsg, self)
         self.message.setStyleSheet("QLabel {font: 12pt;}")
-        #self.message.move(170, 35)
         
         self.passwordbox = QLineEdit(self)
         self.passwordbox.hasSelectedText
         self.passwordbox.setStyleSheet("QLineEdit {font: 18;}")
-        #self.passwordbox.move(125,100)
 
         if not self.first_time:
             self.passwordbox.setEchoMode(QLineEdit.Password)
-        self.passwordbox.resize(250, 100)
         
         self.button = QPushButton("Submit", self)
         self.button.setAutoFillBackground(Qt.white)     
         self.button.setStyleSheet("QPushButton {font: 12pt bold;}")
         self.button.setToolTip("Enter password and then click this button or press the ENTER key")
-        #self.button.move(200, 300)
+
         self.button.clicked.connect(self.on_click)
         
         self.error = QLabel("Incorrect Password", self)
         self.error.setStyleSheet("QLabel {font: 12pt; color:red; }")
         self.error.hide()
-        #self.error.move(160,250)
 
         self.stack = QStackedWidget(self)
 
+        vbox.addWidget(self.logo)
         vbox.addWidget(self.message)
         vbox.addWidget(self.passwordbox)
         vbox.addWidget(self.button)
         vbox.addWidget(self.error)
         vbox.addWidget(self.stack)
 
-        vbox.setSpacing(80)
+        vbox.setSpacing(40)
 
         vbox.addWidget(self.stack)
+        vbox.setAlignment(self.message,Qt.AlignCenter)
+        vbox.setAlignment(self.logo, Qt.AlignCenter)
         self.setLayout(vbox)
 
         self.main_menu = QWidget()
