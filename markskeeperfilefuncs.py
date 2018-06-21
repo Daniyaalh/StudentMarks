@@ -14,9 +14,8 @@ def get_info(file):
         print(all_marks)
         return all_marks
 
-def add_course(all_marks):
-    code = "csc3122"
-    if code not in all_marks:  # What if it already exists?
+def add_course(all_marks, course_code):
+    if course_code not in all_marks:  # What if it already exists?
         all_marks[code] = []
 
 def delete_course(all_marks):

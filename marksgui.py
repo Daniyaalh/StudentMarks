@@ -1,12 +1,13 @@
 import sys, os
-#import addmarks
+from addmarks import *
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, \
 QLineEdit, QLabel, QAction, QComboBox, QVBoxLayout, QSpacerItem, \
 QStackedWidget, QFormLayout, QTableWidget, QTableWidgetItem
 from PyQt5.QtGui import *
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtCore import Qt
-
+from PyQt5.QtCore import pyqtSlot, Qt 
+#from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QTimer
+from crypto import *
 def view_all_summary(screen):
 
     title = QLabel("Summary", screen.view_all_summary)
@@ -17,7 +18,7 @@ def view_all_summary(screen):
     font.setBold(True)
     layout = QVBoxLayout()
     table = QTableWidget()
-    table.setRowCount(5)
+    table.setRowCount(len(screen.all_marks)+1)
     table.setColumnCount(3)
     table.verticalHeader().setVisible(False)
     table.horizontalHeader().setVisible(False)
@@ -40,6 +41,16 @@ def view_all_summary(screen):
 
     table.setItem(1,0, QTableWidgetItem("CSC456"))
 
+    index = 1
+    for course in screen.all_marks:
+        average, worth = average_and_worth(screen.all_marks[course])
+        print(average, worth)
+        table.setItem(index, 0, QTableWidgetItem(course))
+        table.setItem(index, 1, QTableWidgetItem(str(round(average,5))))
+        table.setItem(index, 2, QTableWidgetItem(str(round(worth,5))))
+        index += 1
+        
+    
     button = QPushButton("Back")
     button.clicked.connect(screen.back_click)
 
@@ -66,12 +77,33 @@ def view_all_summary(screen):
     screen.view_all_summary.setLayout(layout)
     #screen.show()
 
+def update_widgets(screen):
+    screen.enter_marks.update()
+    """
+    view_all_summary(screen)
+    view_course_marks(screen)
+    addMarkGUI(screen)
+    edit_marks(screen)
+    add_course(screen)
+    delete_course(screen)
+    """
+    # call the functiona to build the widgets
+
+def average_and_worth(course):
+    total_average = 0
+    worth = 0
+    for data in course:
+        total_average += (data[1] / data[2]) * data[3]
+        worth += data[3]
+
+    return (total_average / worth) * 100, worth
+
 def view_course_marks(screen):
     layout = QVBoxLayout()
     
     table = QTableWidget()
 
-    table.setRowCount(5)
+    table.setRowCount(len(screen.all_marks) + 1)
     table.setColumnCount(3)
 
     course_code = QTableWidgetItem("Assignment Name")
@@ -93,9 +125,25 @@ def view_course_marks(screen):
     table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
     
     course_name = QComboBox(screen.view_course_marks)
-    course_name.addItem("CSC263")
-    course_name.addItem("CSC343")
+    
+    course_name.addItem("csc456")
+    course_name.addItem("csc234")
     course_name.setStyleSheet("QComboBox {font: 18;}")
+    #for course in screen.all_marks:
+     #   course_name.addItem(course)
+
+    
+    # get course code and then add assignments
+    index = 0
+    for data in screen.all_marks[course_name.currentText()]:
+        index += 1
+        table.setItem(index, 0, QTableWidgetItem(data[0]))
+        table.setItem(index, 1, QTableWidgetItem(str(data[1]/data[2] * 100)))
+        table.setItem(index, 2, QTableWidgetItem(str(data[3])))
+    
+        
+    
+    course_name.currentIndexChanged.connect(lambda: screen.course_combo_changed(table, course_name))
     
     topword = QLabel("View Marks for a Course", screen.view_course_marks)
     topword.setStyleSheet("QLabel {font: 12pt bold;}")
@@ -142,6 +190,12 @@ def addMarkGUI(screen):
     backButton.setStyleSheet("QLineEdit {font: 8pt;}")
     backButton.clicked.connect(screen.back_click)
 
+    msg = QLabel("Mark Added!", screen.add_course)
+    msg.setStyleSheet("QLabel {font: 12pt;}")
+    msg.hide()
+
+    submitButton.clicked.connect(lambda: screen.enter_submit_click(course_name, assign_name, num, denom, worth, msg))
+
     layout.addWidget(topword)
     layout.addWidget(course_name)
     layout.addRow("Course Code:", course_name)
@@ -151,6 +205,7 @@ def addMarkGUI(screen):
     layout.addRow("How much it was worth:", worth)
     layout.addWidget(submitButton)
     layout.addWidget(backButton)
+    layout.addWidget(msg)
 #After entered, clear textboxes
     screen.enter_marks.setLayout(layout)
     
@@ -169,23 +224,28 @@ def edit_marks(screen):
     assign_name.addItem("A1")
     assign_name.addItem("A2")
 
-    num = QLineEdit(screen.enter_marks)
+    num = QLineEdit(screen.edit_marks)
     num.setStyleSheet("QLineEdit {font: 12pt bold;}")
     
-    denom= QLineEdit(screen.enter_marks)
+    denom= QLineEdit(screen.edit_marks)
     denom.setStyleSheet("QLineEdit {font: 12pt bold;}")
     
-    worth = QLineEdit(screen.enter_marks)
+    worth = QLineEdit(screen.edit_marks)
     worth.setStyleSheet("QLineEdit {font: 12pt bold;}")
 
-    submitButton = QPushButton("Enter", screen.enter_marks)
+    submitButton = QPushButton("Enter", screen.edit_marks)
     submitButton.setStyleSheet("QPushButton {font: 12pt bold;}")
+
+    msg = QLabel("Mark Edited!", screen.edit_marks)
+    msg.setStyleSheet("QLabel {font: 12pt;}")
+    msg.hide()
+    
+    submitButton.clicked.connect(lambda: screen.edit_mark_click(course_name, assign_name, num, denom, worth, msg))
 
     backButton = QPushButton("Back", screen.enter_marks)
     backButton.setStyleSheet("QLineEdit {font: 8pt;}")
     backButton.clicked.connect(screen.back_click)
-
-    layout.addWidget(topword)
+    
     layout.addRow("Course Code", course_name)
     layout.addRow("Assignment Name", assign_name)
     layout.addRow("Revised what you got", num)
@@ -193,6 +253,7 @@ def edit_marks(screen):
     layout.addRow("Revised worth", worth)
     layout.addWidget(submitButton)
     layout.addWidget(backButton)
+    layout.addWidget(msg)
 
     layout.setSpacing(20)
 
@@ -220,10 +281,14 @@ def add_course(screen):
 
     submitButton = QPushButton("Add", screen.add_course)
     submitButton.setStyleSheet("QPushButton {font: 18pt bold;}")
-
+    
     backButton = QPushButton("Back", screen.add_course)
     backButton.setStyleSheet("QLineEdit {font: 8pt;}")
     backButton.clicked.connect(screen.back_click)
+
+    msg = QLabel("Mark Added!", screen.add_course)
+    msg.setStyleSheet("QLabel {font: 8pt;}")
+    msg.hide()
 
     layout.addWidget(top)
     layout.setAlignment(top, Qt.AlignCenter)
@@ -231,9 +296,11 @@ def add_course(screen):
     layout.addWidget(course_name)
     layout.addWidget(submitButton)
     layout.addWidget(backButton)
+    layout.addWidget(msg)
     layout.setAlignment(Qt.AlignTop)
 
     layout.setSpacing(20)
+    submitButton.clicked.connect(lambda: screen.add_a_course_click(course_name, msg))
     screen.add_course.setLayout(layout)
 
 def delete_course(screen):
@@ -248,6 +315,12 @@ def delete_course(screen):
     course_name = QComboBox(screen.delete_course)
     course_name.setStyleSheet("QComboBox {font: 12pt bold;}")
 
+    for course in screen.all_marks:
+        course_name.addItem(course)
+
+    #course_name.addItem("CSC345")
+    #course_name.addItem("CFC5656")
+
     submitButton = QPushButton("Delete", screen.delete_course)
     submitButton.setStyleSheet("QPushButton {font: 18pt bold;}")
 
@@ -255,12 +328,19 @@ def delete_course(screen):
     backButton.setStyleSheet("QPushButton {font: 8pt;}")
     backButton.clicked.connect(screen.back_click)
 
+    msg = QLabel("Course Deleted!", screen.delete_course)
+    msg.setStyleSheet("QLabel {font: 12pt;}")
+    msg.hide()
+
+    submitButton.clicked.connect(lambda: screen.delete_a_course_click(course_name, msg))
+
     layout.addWidget(top)
     layout.setAlignment(top, Qt.AlignCenter)
     layout.addWidget(name_label)
     layout.addWidget(course_name)
     layout.addWidget(submitButton)
     layout.addWidget(backButton)
+    layout.addWidget(msg)
 
     layout.setAlignment(Qt.AlignTop)
     layout.setSpacing(20)
@@ -297,6 +377,10 @@ def makeMain(window):
     deleteCourseButton.setStyleSheet("QPushButton {font: 12pt bold;}")
     deleteCourseButton.clicked.connect(window.delete_course_click)
 
+    exitButton = QPushButton("Save and Exit", window.main_menu)
+    exitButton.setStyleSheet("QPushButton {font: 12pt bold;}")
+    exitButton.clicked.connect(window.exit)
+
     layout.addWidget(label)
     layout.addWidget(viewButton)
     layout.addWidget(course_marks)
@@ -304,8 +388,9 @@ def makeMain(window):
     layout.addWidget(editMarkButton)
     layout.addWidget(addCourseButton)
     layout.addWidget(deleteCourseButton)
+    layout.addWidget(exitButton)
 
-    layout.setSpacing(30)
+    layout.setSpacing(25)
     window.main_menu.setLayout(layout)   
 
 """
@@ -335,7 +420,10 @@ class App(QWidget):
         self.setMinimumSize(500, 500)
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
+        self.all_marks = {"csc456":[["a1",45,45,67], ["a2", 34,67,2]], "csc234":[["prog",56,67,12]]}
 
+        self.password = "3331"
+        
         testWidget = QWidget()
         self.actionExit = QAction(("&Exit"), self)
         self.actionExit.setShortcut(QKeySequence(Qt.Key_Return)) #Ctrl+Q
@@ -405,8 +493,7 @@ class App(QWidget):
         edit_marks(self)
         add_course(self)
         delete_course(self)
-        
-        
+                
         self.stack.addWidget(self.main_menu)
         self.stack.addWidget(self.view_all_summary)
         self.stack.addWidget(self.view_course_marks)
@@ -414,13 +501,12 @@ class App(QWidget):
         self.stack.addWidget(self.edit_marks)
         self.stack.addWidget(self.add_course)
         self.stack.addWidget(self.delete_course)
-
         
         self.show()
 
     
     def on_click(self):
-        if (self.passwordbox.text() == "3331"):
+        if (self.passwordbox.text() == self.password):
             self.actionExit.setEnabled(False)
             hideEnter(self)
             self.stack.setCurrentWidget(self.main_menu)
@@ -429,8 +515,6 @@ class App(QWidget):
             self.error.show()
             self.passwordbox.setText("")
             
-
-    
     def view_all_click(self):
         self.stack.setCurrentIndex(1)
 
@@ -451,6 +535,121 @@ class App(QWidget):
        
     def back_click(self):
         self.stack.setCurrentIndex(0)
+
+    def enter_submit_click(self, course, name, num, denom, worth, msg):
+        course = course.currentText()
+        name_s = name.text()
+        num_s = num.text()
+        denom_s = denom.text()
+        worth_s = worth.text()
+        
+        name.setText("")
+        num.setText("")
+        denom.setText("")
+        worth.setText("")
+
+        to_display = add_mark(course, name_s, num_s, denom_s, worth_s)
+
+        if to_display == "Success":
+            msg.setText(to_display)
+            msg.setStyleSheet("QLabel {font: 12pt; color:green;}")
+            msg.show()
+            QTimer.singleShot(2000, msg.hide)
+
+        else:
+            msg.setText(to_display)
+            msg.setStyleSheet("QLabel {font: 8pt; color:red;}")
+            msg.show()
+            QTimer.singleShot(2000, msg.hide)
+            
+            
+
+    def exit(self):
+        file = open("marks.txt", "w")
+        to_write = encode(self.password, str(self.all_marks))
+        file.write(to_write)
+        file.close()        
+        sys.exit(0)
+
+    def add_a_course_click(self, course, msg):
+        course_s = course.text()
+        course.setText("")
+        if course_s not in self.all_marks:
+            self.all_marks[course_s] = []
+            print(self.all_marks)
+            msg.hide()
+            msg.setText("Course Added!")
+            msg.setStyleSheet("QLabel {font: 12pt; color: green;}")
+            msg.show()
+            QTimer.singleShot(2000, msg.hide)
+            
+        else:
+            msg.setText("Course not Added")
+            msg.setStyleSheet("QLabel {font: 12pt; color: red;}")
+            msg.show()
+            QTimer.singleShot(2000, msg.hide)
+            
+
+    def delete_a_course_click(self, course, msg):
+        course_s = course.currentText()
+        
+        try:
+            del self.all_marks[course_s]
+            msg.setText("Course Deleted")
+            msg.setStyleSheet("QLabel {font: 12pt; color: green;}")
+            msg.show()
+            update_widgets(self)
+            QTimer.singleShot(2000, msg.hide)
+            course.removeItem(course.currentIndex())
+
+        except:
+            msg.setText("Course Not Deleted")
+            msg.setStyleSheet("QLabel {font: 12pt; color: red;}")
+            msg.show()
+            QTimer.singleShot(2000, msg.hide)
+
+    def edit_mark_click(self, course, name, num, denom, worth, msg):
+        course_s = course.currentText()
+        name_s = name.currentText()
+        num_s = num.text()
+        denom_s = denom.text()
+        worth_s = worth.text()
+
+        num.setText("")
+        denom.setText("")
+        worth.setText("")
+        to_display = edit_marks_func(course_s, name_s, num_s, denom_s, worth_s)
+        msg.setText(to_display)
+
+    def course_combo_changed(self, table, combo): #get the table and the new course code
+        course = combo.currentText()
+        index = 1
+        table.clear()
+        table.setRowCount(len(self.all_marks[course])+1)
+        course_code = QTableWidgetItem("Course Code")
+        course_code.setBackground(QColor(255,128,128))
+
+        mark = QTableWidgetItem("Mark (%)")
+        mark.setBackground(QColor(255,128,128))
+
+        completed = QTableWidgetItem("% Worth")
+        completed.setBackground(QColor(255,128,128))
+
+        table.setItem(0,0, course_code)
+        table.setItem(0,1, mark)
+        table.setItem(0,2, completed)
+        
+        for assignment in self.all_marks[course]:
+            print(assignment)
+            mark = round(assignment[1] / assignment[2] *100, 5)
+            print("after mark")
+            
+            table.setItem(index, 0, QTableWidgetItem(assignment[0]))
+            table.setItem(index, 1, QTableWidgetItem(str(mark)))
+            table.setItem(index, 2, QTableWidgetItem(str(assignment[3])))
+            index += 1
+                                   
+        
         
 if __name__ == '__main__':
     app  = QApplication(sys.argv)
