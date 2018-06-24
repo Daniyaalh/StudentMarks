@@ -21,8 +21,10 @@ def decode(key, enc):
 
 def getFile():
     file = open("test2.txt", "w")
-    d = {"csc235":[["a1",56,57,60],["hi",34,36,12]], "csc311":[["aa6",34,38,12]]}
-    to_write = encode("3334", str(d))
+    #d = {"csc235":[["a1",56,57,60],["hi",34,36,12]], "csc311":[["aa6",34,38,12]]}
+    #to_write = encode("3334", str(d))
+    password = "3331"
+    to_write = encode("3331\n", "3331\n")
     file.write(to_write)
     """
     password = "3331"
@@ -33,6 +35,10 @@ def getFile():
     b = decode(password, a)
     print(b)
     """
+def test_write():
+    file = open("test2.txt", "w")
+    file.write(str(encode("3331", "3331")) + "\n")
+    file.write("jj")
+    file.close()
 
-
-getFile()
+test_write()
