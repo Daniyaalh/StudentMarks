@@ -85,16 +85,17 @@ def view_all_summary(screen):
     screen.view_all_summary.setLayout(layout)
     #screen.show()
 
+"""
 def update_widgets(screen):
     #screen.enter_marks.update()
-    """
+    
     if command == "delete course":
         pass
     if command == "add course":
         pass
 
     if command == "edit
-    """
+    
     print("here")
     #view_all_summary(screen)
     print("1")
@@ -107,7 +108,7 @@ def update_widgets(screen):
     delete_course(screen)
     
     # call the functiona to build the widgets
-
+"""
 def average_and_worth(course):
     total_average = 0
     worth = 0
@@ -117,7 +118,7 @@ def average_and_worth(course):
 
     return (total_average / worth) * 100, worth
 
-def update_summary(table, screen):
+def update_summary(table, screen, delete=None):
     table.setRowCount(len(screen.all_marks)+1)
     table.clear()
 
@@ -133,12 +134,14 @@ def update_summary(table, screen):
     table.setItem(0,0, course_code)
     table.setItem(0,1, mark)
     table.setItem(0,2, completed)
-
+    print("in update summary")
     index = 1
     
     for course in screen.all_marks:
+        if delete and course == delete:
+            pass
         
-        if screen.all_marks[course] == []:
+        elif screen.all_marks[course] == []:
             table.setItem(index, 0, QTableWidgetItem(course))
             table.setItem(index, 1, QTableWidgetItem("0"))
             table.setItem(index, 2, QTableWidgetItem("0"))
@@ -158,6 +161,7 @@ def view_course_marks(screen):
     layout = QVBoxLayout()
     
     table = QTableWidget()
+    screen.update_widgets["course_marks_table"] = table
 
     table.setRowCount(len(screen.all_marks) + 1)
     table.setColumnCount(3)
@@ -276,15 +280,19 @@ def edit_marks(screen):
     course_name = QComboBox(screen.edit_marks)
     screen.update_widgets["edit_course_combo"] = course_name
     
-    course_name.addItem("CSC263")
-    course_name.addItem("CSC343")
-    course_name.setStyleSheet("QComboBox {font: 12pt;}")
+    for course in screen.all_marks:
+        course_name.addItem(course)
+        course_name.setStyleSheet("QComboBox {font: 12pt;}")
 
     assign_name = QComboBox(screen.edit_marks)
     screen.update_widgets["edit_assignment_combo"] = assign_name
-    assign_name.setStyleSheet("QComboBox {font: 12pt;}")
-    assign_name.addItem("A1")
-    assign_name.addItem("A2")
+
+    for assignments in screen.all_marks[course_name.itemText(0)]:
+        assign_name.addItem(assignments[0])
+        assign_name.setStyleSheet("QComboBox {font: 12pt;}")
+
+        
+    course_name.currentIndexChanged.connect(lambda: screen.edit_marks_change(assign_name, course_name.currentText()))
 
     num = QLineEdit(screen.edit_marks)
     num.setStyleSheet("QLineEdit {font: 12pt bold;}")
@@ -381,8 +389,6 @@ def delete_course(screen):
     for course in screen.all_marks:
         course_name.addItem(course)
 
-    #course_name.addItem("CSC345")
-    #course_name.addItem("CFC5656")
 
     submitButton = QPushButton("Delete", screen.delete_course)
     submitButton.setStyleSheet("QPushButton {font: 18pt bold;}")
@@ -615,7 +621,7 @@ class App(QWidget):
         self.stack.setCurrentIndex(0)
 
     def enter_submit_click(self, course, name, num, denom, worth, msg):
-        course = course.currentText()
+        course_s = course.currentText()
         name_s = name.text()
         num_s = num.text()
         denom_s = denom.text()
@@ -626,16 +632,17 @@ class App(QWidget):
         denom.setText("")
         worth.setText("")
 
-        to_display = add_mark(course, name_s, num_s, denom_s, worth_s, self.all_marks[course])
-
+        to_display = add_mark(course_s, name_s, num_s, denom_s, worth_s, self.all_marks[course_s])
+        
         if to_display == "Success":
             msg.setText(to_display)
             msg.setStyleSheet("QLabel {font: 12pt; color:green;}")
             msg.show()
-            self.all_marks[course].insert(0,[name_s,int(num_s), int(denom_s), int(worth_s)])
-            print(self.all_marks)
-            # Do for summary of all marks
+            self.all_marks[course_s].insert(0,[name_s,int(num_s), int(denom_s), int(worth_s)])
             update_summary(self.update_widgets["view_all_table"], self)
+            self.course_combo_changed(self.update_widgets["course_marks_table"], course)
+            print(self.update_widgets)
+            self.update_widgets["course_marks_combo"].setCurrentIndex(self.update_widgets["course_marks_combo"].findText(course_s))
             QTimer.singleShot(2000, msg.hide)
 
         else:
@@ -643,8 +650,7 @@ class App(QWidget):
             msg.setStyleSheet("QLabel {font: 8pt; color:red;}")
             msg.show()
             QTimer.singleShot(2000, msg.hide)
-            
-            
+
 
     def exit(self):
         file = open("marks.txt", "w")
@@ -672,6 +678,7 @@ class App(QWidget):
             self.update_widgets["enter_mark_combo"].addItem(course_s)
 
             update_summary(self.update_widgets["view_all_table"], self)
+            self.edit_marks_change(self.update_widgets["course_marks_combo"], course_s)
             
             QTimer.singleShot(2000, msg.hide)
 
@@ -693,10 +700,9 @@ class App(QWidget):
             self.stack.update()
             self.update_widgets["course_marks_combo"].removeItem(self.update_widgets["course_marks_combo"].findText(course_s, Qt.MatchFixedString))
             self.update_widgets["edit_course_combo"].removeItem(self.update_widgets["edit_course_combo"].findText(course_s, Qt.MatchFixedString))
-            #self.update_widgets["delete_course_combo"].removeItem(self.update_widgets["delete_course_combo"].findText(course_s, Qt.MatchFixedString))
             self.update_widgets["enter_mark_combo"].removeItem(self.update_widgets["enter_mark_combo"].findText(course_s, Qt.MatchFixedString))
 
-
+            update_summary(self.update_widgets["view_all_table"], self, course_s)
             course.removeItem(course.currentIndex())
             QTimer.singleShot(2000, msg.hide)
             
@@ -716,13 +722,39 @@ class App(QWidget):
         num.setText("")
         denom.setText("")
         worth.setText("")
+        print("before display")
         to_display = edit_marks_func(course_s, name_s, num_s, denom_s, worth_s)
+        print("after display")
         msg.setText(to_display)
+        print("after real display")
+        for assign in self.all_marks[course_s]:
+            print("assign", assign, "course_s is", course_s, "name is", name_s)
+            if assign[0] == name_s:
+                assign[1] = int(num_s)
+                assign[2] = int(denom_s)
+                assign[3] = int(worth_s)
+                print("CHANGEDDDD", assign)
+                break
 
+        update_summary(self.update_widgets["view_all_table"], self)
+        index = self.update_widgets["course_marks_combo"].findText(course_s, Qt.MatchFixedString)
+        self.update_widgets["course_marks_combo"].setCurrentIndex(index)
+        self.course_combo_changed(self.update_widgets["course_marks_table"], self.update_widgets["course_marks_combo"])
+        
+
+    def edit_marks_change(self, combo, course):
+        combo.clear()
+        
+        for assign in self.all_marks[course]:
+            print(assign)
+            combo.addItem(assign[0])
+        
     def course_combo_changed(self, table, combo): #get the table and the new course code
+        print(table, combo)
         course = combo.currentText()
         index = 1
         table.clear()
+        print("here in changed")
         table.setRowCount(len(self.all_marks[course])+1)
         course_code = QTableWidgetItem("Course Code")
         course_code.setBackground(QColor(255,128,128))
