@@ -5,9 +5,8 @@ QLineEdit, QLabel, QAction, QComboBox, QVBoxLayout, QSpacerItem, \
 QStackedWidget, QFormLayout, QTableWidget, QTableWidgetItem
 from PyQt5.QtGui import *
 from PyQt5.QtCore import pyqtSlot, Qt, QTimer
-#from PyQt5.QtCore import Qt
-#from PyQt5.QtCore import QTimer
 from crypto import *
+
 def view_all_summary(screen):
 
     title = QLabel("Summary", screen.view_all_summary)
@@ -36,9 +35,6 @@ def view_all_summary(screen):
     table.setItem(0,0, course_code)
     table.setItem(0,1, mark)
     table.setItem(0,2, completed)
-    table.setRowHeight(0, 50)
-    table.setMinimumWidth(450)
-    table.setMinimumHeight(400) #Will need to set max height as well
 
     index = 1
     
@@ -61,9 +57,6 @@ def view_all_summary(screen):
     
     button = QPushButton("Back")
     button.clicked.connect(screen.back_click)
-
-    #w = verticalHeader()->width() + horizontalHeader()->length() + frameWidth()*2
-#h = horizontalHeader()->height() + verticalHeader()->length() + frameWidth()*2
     
     table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
     table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -73,42 +66,9 @@ def view_all_summary(screen):
     
     layout.addWidget(table)
     layout.addWidget(button)
-    
-
-    #layout.addWidget(QLabel("Course"), 0, 0)
-    #layout.addWidget(QLabel("Mark"), 0, 1)
-    #layout.addWidget(QLabel("Percent of Course Completed"), 0, 2)
-    
-    #layout.addWidget(QLabel("CSC256"), 1, 0)
-    #layout.addWidget(QLabel("CSC%^%").setStyleSheet("QLabel {font: 15pt;}"), 1, 1)
 
     screen.view_all_summary.setLayout(layout)
-    #screen.show()
 
-"""
-def update_widgets(screen):
-    #screen.enter_marks.update()
-    
-    if command == "delete course":
-        pass
-    if command == "add course":
-        pass
-
-    if command == "edit
-    
-    print("here")
-    #view_all_summary(screen)
-    print("1")
-    view_course_marks(screen)
-    print("nn")
-    addMarkGUI(screen)
-    print("2")
-    edit_marks(screen)
-    add_course(screen)
-    delete_course(screen)
-    
-    # call the functiona to build the widgets
-"""
 def average_and_worth(course):
     total_average = 0
     worth = 0
@@ -185,16 +145,15 @@ def view_course_marks(screen):
     table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
     
     course_name = QComboBox(screen.view_course_marks)
+    course_name.setStyleSheet("QComboBox {font: 10pt;}")
+    
     screen.update_widgets["course_marks_combo"] = course_name
     
 
     for i in screen.all_marks:
         course_name.addItem(i)
         course_name.setStyleSheet("QComboBox {font: 18;}")
-    #for course in screen.all_marks:
-     #   course_name.addItem(course)
 
-    
     # get course code and then add assignments
     index = 0
     for data in screen.all_marks[course_name.currentText()]:
@@ -226,6 +185,7 @@ def addMarkGUI(screen):
    
     topword = QLabel("Enter a Mark", screen.enter_marks)
     topword.setStyleSheet("QLabel {font: 12pt bold;}")
+    topword.setAlignment(Qt.AlignRight)
 
     course_name = QComboBox(screen.enter_marks)
     screen.update_widgets["enter_mark_combo"] = course_name
@@ -259,7 +219,7 @@ def addMarkGUI(screen):
 
     submitButton.clicked.connect(lambda: screen.enter_submit_click(course_name, assign_name, num, denom, worth, msg))
 
-    layout.addWidget(topword)
+    layout.addRow(topword, QLabel(""))
     layout.addWidget(course_name)
     layout.addRow("Course Code:", course_name)
     layout.addRow("Assignment Name:", assign_name)
@@ -268,12 +228,15 @@ def addMarkGUI(screen):
     layout.addRow("How much it was worth:", worth)
     layout.addWidget(submitButton)
     layout.addWidget(backButton)
-    layout.addWidget(msg)
-#After entered, clear textboxes
+    #layout.addWidget(msg)
+    layout.addRow(msg, QLabel(""))
+
+    layout.setSpacing(10)
     screen.enter_marks.setLayout(layout)
     
 def edit_marks(screen):
     layout = QFormLayout()
+    
     topword = QLabel("Edit Marks", screen.edit_marks)
     topword.setStyleSheet("QLabel {font: 12pt bold;}")
 
@@ -315,7 +278,8 @@ def edit_marks(screen):
     backButton = QPushButton("Back", screen.enter_marks)
     backButton.setStyleSheet("QLineEdit {font: 8pt;}")
     backButton.clicked.connect(screen.back_click)
-    
+
+    layout.addRow(topword, QLabel(""))
     layout.addRow("Course Code", course_name)
     layout.addRow("Assignment Name", assign_name)
     layout.addRow("Revised what you got", num)
@@ -325,9 +289,8 @@ def edit_marks(screen):
     layout.addWidget(backButton)
     layout.addWidget(msg)
 
-    layout.setSpacing(20)
+    layout.setSpacing(15)
 
-    screen.edit_marks.move(40, 70)
     screen.edit_marks.setLayout(layout)
     
 def hideEnter(screen):
@@ -462,13 +425,6 @@ def makeMain(window):
     layout.setSpacing(25)
     window.main_menu.setLayout(layout)   
 
-"""
-def hideMainButton(screen):
-    screen.editMarkButton.hide()
-    screen.enterMarkButton.hide()
-    screen.viewButton.hide()
-    screen.passwordmsg.hide()
-"""
 class App(QWidget):
 
     def __init__(self):
@@ -489,12 +445,13 @@ class App(QWidget):
         self.setMinimumSize(500, 500)
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
-        self.all_marks = {"csc456":[["a1",45,45,67], ["a2", 34,67,2]], "csc234":[["prog",56,67,12]]}
+        #self.all_marks = {"csc456":[["a1",45,45,67], ["a2", 34,67,2]], "csc234":[["prog",56,67,12]]}
         self.update_widgets = {}
         
         if not self.first_time:
             file = open("marks.txt")
             self.password = file.readline().strip()
+            #self.all_marks_coded = file.readline()
                    
         testWidget = QWidget()
         self.actionExit = QAction(("&Exit"), self)
@@ -581,6 +538,7 @@ class App(QWidget):
         if not self.first_time:
             try:
                 if self.passwordbox.text() == decode(self.passwordbox.text(), self.password):
+                    self.all_marks = decode(self.all_marks_coded)
                     self.actionExit.setEnabled(False)
                     hideEnter(self)
                     self.actual_password = self.passwordbox.text()
@@ -638,11 +596,17 @@ class App(QWidget):
             msg.setText(to_display)
             msg.setStyleSheet("QLabel {font: 12pt; color:green;}")
             msg.show()
+            
             self.all_marks[course_s].insert(0,[name_s,int(num_s), int(denom_s), int(worth_s)])
             update_summary(self.update_widgets["view_all_table"], self)
+            print(self.update_widgets["course_marks_table"], course)
             self.course_combo_changed(self.update_widgets["course_marks_table"], course)
-            print(self.update_widgets)
+            print("add marks", self.update_widgets)
             self.update_widgets["course_marks_combo"].setCurrentIndex(self.update_widgets["course_marks_combo"].findText(course_s))
+            
+            print(self.update_widgets["edit_course_combo"], course_s, "is right before edit marks change function")
+            self.edit_marks_change(self.update_widgets["edit_assignment_combo"], course_s)
+            print("after after after ")
             QTimer.singleShot(2000, msg.hide)
 
         else:
@@ -678,8 +642,9 @@ class App(QWidget):
             self.update_widgets["enter_mark_combo"].addItem(course_s)
 
             update_summary(self.update_widgets["view_all_table"], self)
-            self.edit_marks_change(self.update_widgets["course_marks_combo"], course_s)
-            
+            print("after update")
+            #self.edit_marks_change(self.update_widgets["course_marks_combo"], course_s)
+            print("after marks change")
             QTimer.singleShot(2000, msg.hide)
 
         else:
@@ -725,38 +690,60 @@ class App(QWidget):
         print("before display")
         to_display = edit_marks_func(course_s, name_s, num_s, denom_s, worth_s)
         print("after display")
-        msg.setText(to_display)
-        print("after real display")
-        for assign in self.all_marks[course_s]:
-            print("assign", assign, "course_s is", course_s, "name is", name_s)
-            if assign[0] == name_s:
-                assign[1] = int(num_s)
-                assign[2] = int(denom_s)
-                assign[3] = int(worth_s)
-                print("CHANGEDDDD", assign)
-                break
+        print(to_display)
 
-        update_summary(self.update_widgets["view_all_table"], self)
-        index = self.update_widgets["course_marks_combo"].findText(course_s, Qt.MatchFixedString)
-        self.update_widgets["course_marks_combo"].setCurrentIndex(index)
-        self.course_combo_changed(self.update_widgets["course_marks_table"], self.update_widgets["course_marks_combo"])
-        
+        if to_display == "Success":
+            msg.setStyleSheet("QLabel {font: 15pt; color:green;}")
+            msg.setText(to_display)
+            msg.show()
+            
+            print("after real display")
+            for assign in self.all_marks[course_s]:
+                print("assign", assign, "course_s is", course_s, "name is", name_s)
+                if assign[0] == name_s:
+                    assign[1] = int(num_s)
+                    assign[2] = int(denom_s)
+                    assign[3] = int(worth_s)
+                    print("CHANGEDDDD", assign)
+                    break
+
+            update_summary(self.update_widgets["view_all_table"], self)
+            index = self.update_widgets["course_marks_combo"].findText(course_s, Qt.MatchFixedString)
+            self.update_widgets["course_marks_combo"].setCurrentIndex(index)
+            print("after setting index")
+            self.course_combo_changed(self.update_widgets["course_marks_table"], self.update_widgets["course_marks_combo"])
+            #self.edit_marks_change(self.update_widgets["edit_course_combo"], course_s)
+            print("after the after setting index !!!!!")
+            QTimer.singleShot(2000, msg.hide)
+            
+        else:
+            msg.setText(to_display)
+            msg.setStyleSheet("QLabel {font: 8pt; color:red;}")
+            msg.show()
+            QTimer.singleShot(2000, msg.hide)
 
     def edit_marks_change(self, combo, course):
-        combo.clear()
+        try:
+            print(combo,  "is the combo and course is", course)
+            combo.clear()
+            
+            for assign in self.all_marks[course]:
+                print(assign, "in edit marks changed")
+                combo.addItem(assign[0])
+        except:
+            pass
         
-        for assign in self.all_marks[course]:
-            print(assign)
-            combo.addItem(assign[0])
-        
-    def course_combo_changed(self, table, combo): #get the table and the new course code
-        print(table, combo)
+    def course_combo_changed(self, table, combo): #this is when the course marks by itself changes
+        print("course comob changed beginning", table, combo)
         course = combo.currentText()
         index = 1
         table.clear()
-        print("here in changed")
+        
+        print("table is", table)
         table.setRowCount(len(self.all_marks[course])+1)
+        print("here in changed")
         course_code = QTableWidgetItem("Course Code")
+        
         course_code.setBackground(QColor(255,128,128))
 
         mark = QTableWidgetItem("Mark (%)")
