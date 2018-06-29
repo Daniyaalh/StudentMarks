@@ -41,4 +41,5 @@ def test_write():
     file.write("jj")
     file.close()
 
-test_write()
+#test_write()
+print(decode("3331", "ZmZmYg=="))
