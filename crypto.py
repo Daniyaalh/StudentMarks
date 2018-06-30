@@ -18,28 +18,3 @@ def decode(key, enc):
         dec_c = chr((256 + ord(enc[i]) - ord(key_c)) % 256)
         dec.append(dec_c)
     return "".join(dec)
-
-def getFile():
-    file = open("test2.txt", "w")
-    #d = {"csc235":[["a1",56,57,60],["hi",34,36,12]], "csc311":[["aa6",34,38,12]]}
-    #to_write = encode("3334", str(d))
-    password = "3331"
-    to_write = encode("3331\n", "3331\n")
-    file.write(to_write)
-    """
-    password = "3331"
-    l = file.read()
-    print(l)
-    a = encode(password, l)
-    print(a)
-    b = decode(password, a)
-    print(b)
-    """
-def test_write():
-    file = open("test2.txt", "w")
-    file.write(str(encode("3331", "3331")) + "\n")
-    file.write("jj")
-    file.close()
-
-#test_write()
-print(decode("3331", "ZmZmYg=="))
